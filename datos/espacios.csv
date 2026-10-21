@@ -1,0 +1,11 @@
+id_espacio,nombre,tipo,piso,capacidad,reconfigurable,pantalla,camara,amplificacion_voz,wifi,ruta_accesible,privacidad,origen
+A101,Aula 101,aula,1,30,si,si,no,no,si,si,media,simulado
+A102,Aula 102,aula,1,45,si,si,si,no,si,si,media,simulado
+A201,Aula 201,aula,2,90,no,si,no,no,si,si,media,simulado
+A202,Aula 202,aula,2,20,no,no,no,no,si,no,baja,simulado
+A103,Aula 103,aula,1,25,no,si,no,no,si,si,media,simulado
+A104,Aula 104,aula,1,40,no,si,si,no,si,desconocida,media,simulado
+S101,Sala 101,sala,0,12,si,si,si,no,si,si,alta,simulado
+S102,Sala 102,sala,2,8,no,no,no,no,si,no,alta,simulado
+S103,Sala 103,sala,0,35,si,si,no,no,si,si,media,simulado
+AU01,Auditorio 1,auditorio,0,120,no,si,si,si,si,si,baja,simulado
