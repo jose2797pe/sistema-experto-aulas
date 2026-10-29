@@ -1,7 +1,7 @@
-"""12 ejemplos de la versión simplificada, con resultado esperado y obtenido.
+"""12 ejemplos , con resultado esperado y obtenido.
 
 Adaptan situaciones del brief y agregan comprobaciones del nuevo modelo.
-Son pruebas del desarrollo; no representan una nueva aprobación del cliente.
+Son pruebas del desarrollo; 
 """
 
 import argparse

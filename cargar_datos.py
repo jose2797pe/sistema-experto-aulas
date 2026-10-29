@@ -47,8 +47,8 @@ def cargar_catalogo(carpeta=CARPETA_DATOS):
             if codigo in codigos:
                 raise ValueError("Código de espacio repetido.")
             fila["piso"], fila["capacidad"] = int(fila["piso"]), int(fila["capacidad"])
-            if fila["piso"] < 0 or fila["capacidad"] <= 0:
-                raise ValueError("El piso debe ser 0 o mayor y la capacidad debe ser positiva.")
+            if fila["piso"] < -1 or fila["capacidad"] <= 0:
+                raise ValueError("El piso debe ser -1 o mayor y la capacidad debe ser positiva.")
             if fila["tipo"] not in ("aula", "sala", "auditorio"):
                 raise ValueError("El tipo debe ser aula, sala o auditorio.")
             if fila["privacidad"] not in ("baja", "media", "alta"):
