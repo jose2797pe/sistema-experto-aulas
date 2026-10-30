@@ -394,7 +394,7 @@ def mostrar_catalogo(espacios, reservas, fecha_inicial):
                       reconfigurable="reconfigurable" in caracteristicas)
         consultar = st.toggle("Consultar disponibilidad", key="catalogo_disponibilidad")
         if consultar:
-            st.caption("Se muestran las aulas sin reservas que se superpongan con el horario consultado.")
+            st.caption("Se muestran las aulas disponibles, sin reservas en la fecha y el horario seleccionados.")
             dia, desde, hasta = st.columns([1.3, 1, 1])
             with dia:
                 fecha = st.date_input("Fecha para consultar", value=fecha_inicial,
