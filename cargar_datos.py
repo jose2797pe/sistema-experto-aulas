@@ -11,7 +11,7 @@ COLUMNAS_ESPACIOS = (
     "pantalla", "camara", "amplificacion_voz", "wifi", "ruta_accesible",
     "privacidad", "origen",
 )
-COLUMNAS_HORARIOS = ("id_espacio", "fecha", "hora_inicio", "hora_fin", "origen")
+COLUMNAS_RESERVAS = ("id_espacio", "fecha", "hora_inicio", "hora_fin", "origen")
 
 
 def leer_csv(ruta, columnas):
@@ -38,7 +38,7 @@ def convertir_si_no(valor, permite_desconocida=False):
 
 
 def cargar_catalogo(carpeta=CARPETA_DATOS):
-    """Devuelve espacios y franjas LIBRES con números, fechas y booleanos."""
+    """Devuelve las características de los espacios y sus reservas registradas."""
     carpeta = Path(carpeta)
     espacios, codigos = [], set()
     for fila in leer_csv(carpeta / "espacios.csv", COLUMNAS_ESPACIOS):
@@ -63,8 +63,8 @@ def cargar_catalogo(carpeta=CARPETA_DATOS):
     if not espacios:
         raise ValueError("El catálogo de espacios está vacío.")
 
-    horarios = []
-    for fila in leer_csv(carpeta / "horarios.csv", COLUMNAS_HORARIOS):
+    reservas = []
+    for fila in leer_csv(carpeta / "reservas.csv", COLUMNAS_RESERVAS):
         codigo = fila["id_espacio"]
         try:
             if codigo not in codigos:
@@ -77,33 +77,18 @@ def cargar_catalogo(carpeta=CARPETA_DATOS):
             if fila["hora_inicio"] >= fila["hora_fin"]:
                 raise ValueError("La hora de fin debe ser posterior al inicio, en el mismo día.")
         except ValueError as error:
-            raise ValueError(f"horarios.csv, {codigo}: {error}") from error
-        horarios.append(fila)
-    return espacios, horarios
+            raise ValueError(f"reservas.csv, {codigo}: {error}") from error
+        reservas.append(fila)
+    return espacios, reservas
 
 
-def unir_franjas(horarios):
-    """Une franjas vecinas o superpuestas; conserva los huecos sin disponibilidad."""
-    resultado = []
-    for horario in sorted(horarios, key=lambda h: (
-        h["id_espacio"], h["fecha"], h["hora_inicio"], h["hora_fin"]
-    )):
-        actual = dict(horario)
-        if resultado:
-            anterior = resultado[-1]
-            misma_agenda = (anterior["id_espacio"], anterior["fecha"]) == (
-                actual["id_espacio"], actual["fecha"])
-            if misma_agenda and actual["hora_inicio"] <= anterior["hora_fin"]:
-                anterior["hora_fin"] = max(anterior["hora_fin"], actual["hora_fin"])
-                if anterior["origen"] != actual["origen"]:
-                    anterior["origen"] = "mixto"
-                continue
-        resultado.append(actual)
-    return resultado
+def se_superponen(inicio, fin, desde, hasta):
+    """Detecta un cruce real. Terminar justo al comenzar otro intervalo no ocupa."""
+    return inicio < hasta and desde < fin
 
 
 if __name__ == "__main__":
-    espacios, horarios = cargar_catalogo()
-    fechas = sorted({h["fecha"] for h in horarios})
-    print(f"Catálogo simulado cargado: {len(espacios)} espacios y {len(horarios)} franjas libres.")
-    print("Fechas: " + ", ".join(f"{fecha:%d/%m/%Y}" for fecha in fechas))
+    espacios, reservas = cargar_catalogo()
+    fechas = sorted({r["fecha"] for r in reservas})
+    print(f"Catálogo simulado cargado: {len(espacios)} espacios y {len(reservas)} reservas registradas.")
+    print("Fechas con reservas: " + (", ".join(f"{fecha:%d/%m/%Y}" for fecha in fechas) or "ninguna"))

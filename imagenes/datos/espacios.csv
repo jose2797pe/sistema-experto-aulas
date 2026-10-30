@@ -1,0 +1,23 @@
+id_espacio,nombre,tipo,piso,capacidad,reconfigurable,pantalla,camara,amplificacion_voz,wifi,ruta_accesible,privacidad,origen
+A201,Aula 201,aula,2,30,si,si,no,no,si,si,media,simulado
+A202,Aula 202,aula,2,45,si,si,si,no,si,si,media,simulado
+A203,Aula 203,aula,2,60,no,si,no,no,si,si,media,simulado
+A204,Aula 204,aula,2,25,no,no,no,no,si,no,baja,simulado
+A205,Aula 205,aula,2,40,si,si,no,no,si,si,media,simulado
+A206,Aula 206,aula,2,35,si,si,si,no,si,si,alta,simulado
+A301,Aula 301,aula,3,20,no,no,no,no,si,no,baja,simulado
+A302,Aula 302,aula,3,40,si,si,no,no,si,si,media,simulado
+A303,Aula 303,aula,3,35,si,si,si,no,si,si,alta,simulado
+A304,Aula 304,aula,3,70,no,si,no,no,si,si,media,simulado
+A305,Aula 305,aula,3,30,si,si,no,no,si,si,media,simulado
+A306,Aula 306,aula,3,45,no,si,si,no,si,si,media,simulado
+A307,Aula 307,aula,3,50,no,si,no,no,si,si,media,simulado
+A308,Aula 308,aula,3,40,si,si,no,no,si,si,media,simulado
+A309,Aula 309,aula,3,25,no,si,no,no,si,desconocida,media,simulado
+A401,Aula 401,aula,4,35,si,si,si,no,si,si,alta,simulado
+A402,Aula 402,aula,4,60,no,si,no,no,si,si,media,simulado
+A403,Aula 403,aula,4,30,no,no,no,no,si,no,baja,simulado
+A404,Aula 404,aula,4,45,si,si,si,no,si,si,media,simulado
+A405,Aula 405,aula,4,70,no,si,si,no,si,desconocida,media,simulado
+A406,Aula 406,aula,4,40,si,si,no,no,si,si,media,simulado
+AU01,Auditorio,auditorio,-1,120,no,si,si,si,si,si,baja,simulado

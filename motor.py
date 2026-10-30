@@ -7,7 +7,7 @@ from datetime import date, time
 collections.Mapping = collections.abc.Mapping
 
 from experta import AS, MATCH, NOT, TEST, Fact, KnowledgeEngine, Rule
-from cargar_datos import EQUIPAMIENTO, unir_franjas
+from cargar_datos import EQUIPAMIENTO, se_superponen
 
 NIVELES = {None: 0, "baja": 1, "media": 2, "alta": 3}
 NOMBRES = {"pantalla": "TV/pantalla", "camara": "cámara",
@@ -25,8 +25,8 @@ class Espacio(Fact):
     """Características declaradas de un espacio."""
 
 
-class Horario(Fact):
-    """Franja libre declarada, no una reserva."""
+class Reserva(Fact):
+    """Reserva ya registrada que ocupa un espacio en una fecha y un intervalo."""
 
 
 class Comprobacion(Fact):
@@ -114,27 +114,29 @@ class MotorAulas(KnowledgeEngine):
         self.comprobar("R02", c, "capacidad", False,
                        f"Faltan {n - cap} lugares: capacidad {cap}, asistentes {n}.")
 
-    # R03-R04: toda la actividad debe entrar en una franja libre. RF-03.
-    # MATCH une los datos del mismo espacio y fecha. TEST realiza la comparación.
-    @Rule(Solicitud(fecha=MATCH.fecha, hora_inicio=MATCH.inicio, hora_fin=MATCH.fin),
-          Espacio(id_espacio=MATCH.c),
-          Horario(id_espacio=MATCH.c, fecha=MATCH.fecha,
-                  hora_inicio=MATCH.desde, hora_fin=MATCH.hasta),
-          TEST(lambda desde, hasta, inicio, fin: desde <= inicio and fin <= hasta),
-          NOT(Comprobacion(id_espacio=MATCH.c, criterio="disponibilidad")), salience=10)
-    def horario_confirmado(self, c, fecha, inicio, fin, desde, hasta):
-        self.comprobar("R03", c, "disponibilidad", True,
-                       f"El {fecha:%d/%m/%Y}, {inicio:%H:%M}–{fin:%H:%M} entra "
-                       f"en la franja libre {desde:%H:%M}–{hasta:%H:%M}.")
-
-    # La prioridad menor permite buscar primero todas las coincidencias de R03.
+    # R03-R04: disponibilidad según reservas existentes. RF-03.
+    # R04 detecta primero las superposiciones del mismo espacio y fecha.
+    # R03 se ejecuta después: sin conflicto registrado, el intervalo está libre.
     @Rule(Solicitud(fecha=MATCH.fecha, hora_inicio=MATCH.inicio, hora_fin=MATCH.fin),
           Espacio(id_espacio=MATCH.c),
           NOT(Comprobacion(id_espacio=MATCH.c, criterio="disponibilidad")), salience=-10)
-    def horario_no_confirmado(self, c, fecha, inicio, fin):
-        self.comprobar("R04", c, "disponibilidad", False,
-                       f"No hay una franja libre confirmada para el {fecha:%d/%m/%Y} "
+    def disponible_sin_superposicion(self, c, fecha, inicio, fin):
+        self.comprobar("R03", c, "disponibilidad", True,
+                       f"No hay reservas registradas que se superpongan el {fecha:%d/%m/%Y} "
                        f"de {inicio:%H:%M} a {fin:%H:%M}.")
+
+    # Los extremos contiguos no se superponen: una actividad puede comenzar
+    # cuando termina una reserva o terminar cuando comienza la siguiente.
+    @Rule(Solicitud(fecha=MATCH.fecha, hora_inicio=MATCH.inicio, hora_fin=MATCH.fin),
+          Espacio(id_espacio=MATCH.c),
+          Reserva(id_espacio=MATCH.c, fecha=MATCH.fecha,
+                  hora_inicio=MATCH.desde, hora_fin=MATCH.hasta),
+          TEST(lambda desde, hasta, inicio, fin: se_superponen(inicio, fin, desde, hasta)),
+          NOT(Comprobacion(id_espacio=MATCH.c, criterio="disponibilidad")), salience=10)
+    def ocupada_por_reserva(self, c, fecha, inicio, fin, desde, hasta):
+        self.comprobar("R04", c, "disponibilidad", False,
+                       f"La actividad del {fecha:%d/%m/%Y}, {inicio:%H:%M}–{fin:%H:%M}, "
+                       f"se superpone con una reserva registrada de {desde:%H:%M} a {hasta:%H:%M}.")
 
     # R05-R06: todos los equipos obligatorios, sin inferirlos por modalidad. RF-03.
     @Rule(Solicitud(equipamiento_obligatorio=MATCH.req), AS.e << Espacio(id_espacio=MATCH.c),
@@ -184,7 +186,7 @@ class MotorAulas(KnowledgeEngine):
     def privacidad_insuficiente(self, c, nivel, req):
         self.comprobar("R11", c, "privacidad", False, f"Privacidad {nivel}: no alcanza el mínimo {req}.")
 
-    # R12-R13: nuevo criterio pedido por el usuario. No se infiere disposición ni preparación.
+    # R12-R13: permiso para mover mesas y sillas si se solicita como obligatorio.
     @Rule(Solicitud(requiere_reconfiguracion=MATCH.req), Espacio(id_espacio=MATCH.c, reconfigurable=MATCH.permiso),
           TEST(lambda req, permiso: not req or permiso),
           NOT(Comprobacion(id_espacio=MATCH.c, criterio="reconfiguracion")))
@@ -327,8 +329,8 @@ def validar_solicitud(s):
             raise ValueError(f"{campo}: elegí baja, media, alta o sin requisito.")
 
 
-def evaluar(espacios, solicitud, horarios):
-    """Consulta nueva: los CSV y las consultas anteriores no se modifican."""
+def evaluar(espacios, solicitud, reservas):
+    """Evalúa requisitos y reservas existentes sin modificar los datos ni reservar."""
     validar_solicitud(solicitud)
     if not espacios:
         raise ValueError("No hay espacios para evaluar.")
@@ -351,8 +353,8 @@ def evaluar(espacios, solicitud, horarios):
         motor.declare(Preferencia(criterio=criterio, valor=valor))
     for espacio in espacios:
         motor.declare(Espacio(**espacio))
-    for horario in unir_franjas(horarios):
-        motor.declare(Horario(**horario))
+    for reserva in reservas:
+        motor.declare(Reserva(**reserva))
     motor.run()
     return motor
 
@@ -376,4 +378,4 @@ def explicar(motor, codigo):
 CANTIDAD_REGLAS = sum(isinstance(valor, Rule) for valor in MotorAulas.__dict__.values())
 
 if __name__ == "__main__":
-    print(f"Motor con {CANTIDAD_REGLAS} reglas. Para ver ejemplos: python demostracion.py")
+    print(f"Motor con {CANTIDAD_REGLAS} reglas. Abrí la interfaz con: python -m streamlit run interfaz.py")
