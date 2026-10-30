@@ -3,12 +3,14 @@
 Sistema experto con **Experta y Streamlit** que recomienda espacios según sus características y las reservas ficticias ya registradas, y explica sus decisiones. **No crea, modifica ni cancela reservas, ni bloquea horarios.**
 
 Desarrollado por el **Grupo B · Análisis de Datos II · Segundo cuatrimestre de 2026**.
+
 ## Integrantes
-Gustavo Sebastian Cristiano
-Jose Pereira
-Micaela Gomez
-Jose Garibaldi
-José Aníbal Alejandro Franco
+
+- Gustavo Sebastian Cristiano
+- Jose Pereira
+- Micaela Gomez
+- Jose Garibaldi
+- Jose Anibal Alejandro Franco
 
 ## Ejecutar
 
