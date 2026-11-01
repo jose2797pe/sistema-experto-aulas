@@ -1,2 +1,0 @@
-experta==1.9.4
-streamlit==1.64.0
