@@ -68,7 +68,7 @@ La columna **Ejemplo** muestra los datos de una fila: el Aula 201.
 
 ### datos/reservas.csv
 
-Contiene **346 reservas ficticias del 04/11 al 10/11 de 2026**. Cada fila representa un intervalo ocupado para un espacio.
+Contiene **451 reservas ficticias del 04/11 al 17/11 de 2026**. Cada fila representa un intervalo ocupado para un espacio.
 
 La columna **Ejemplo** muestra los datos de una reserva del Aula 201.
 
@@ -104,8 +104,10 @@ Privacidad es un mínimo: alta cumple media. Accesibilidad exige ruta confirmada
 | Resultado | Qué significa |
 | --- | --- |
 | Recomendada | Cumple lo obligatorio y no tiene observaciones. |
-| Compatible con observaciones | Cumple lo obligatorio, pero falta una preferencia o la capacidad supera en más del 50 % a los asistentes. |
+| Compatible con observaciones | Cumple lo obligatorio y tiene un aviso por una preferencia incumplida o por una ocupación prevista inferior al 50 % de su capacidad. |
 | Descartada | Incumple al menos una condición obligatoria. |
+
+**Ocupación prevista (%)** = `(asistentes / capacidad total del aula) × 100`. Con 20 asistentes, un aula de 40 lugares queda al 50 % y no recibe aviso por ocupación. Un aula de 100 lugares queda al 20 % y recibe una observación.
 
 **Orden:** más preferencias opcionales cumplidas y, después, menor cantidad de lugares sobrantes. La primera opción puede ser compatible con observaciones.
 
@@ -124,7 +126,7 @@ Referencias: **Brief del Grupo A (18/09/2026)**, §7 (requisitos RF) y §8 (crit
 | R10–R11 | Comparan la privacidad con el mínimo solicitado. | RF-04; §8. |
 | R12–R13 | Si se necesita mover mesas y sillas, exigen permiso de reconfiguración. | RF-04; §6, adaptado al modelo simplificado. |
 | R14–R15 | Reúnen las seis comprobaciones: solo preseleccionan si se cumplen todas. | RF-03 a RF-05 y RF-07; encadenamiento implementado. |
-| R16–R18 | Calculan lugares sobrantes; si una opción viable supera el 50 % de exceso, agregan aviso sin descartarla. | Umbral: §8. Aviso en toda opción viable: decisión de esta versión. |
+| R16–R18 | Calculan los lugares sobrantes y comprueban la ocupación prevista. Si un espacio viable queda por debajo del 50 % de ocupación, registran una observación sin descartarlo. | §8, adaptado al porcentaje de ocupación. |
 | R19–R21 | Cuentan preferencias cumplidas; cada faltante genera un aviso sin descartar. | RF-04, RF-07 y §8. |
 | R22 | Clasifica como descartada si falla alguna condición obligatoria. | RF-07; §8. |
 | R23 | Clasifica como compatible si cumple lo obligatorio y tiene observaciones. | RF-07; §8. |
@@ -151,7 +153,7 @@ Antes de cada prueba, presiona **Nueva consulta** y selecciona la fecha **04/11/
 - **Cantidad de personas:** 40.
 - **Requisitos obligatorios:** marcar TV/pantalla.
 
-**Esperado:** seis opciones viables. Las primeras cuatro son Aula 302, Aula 308 y Aula 202 como **Recomendada**, y Aula 304 como **Compatible con observaciones** por exceso de capacidad. Aula 306 se descarta porque esta reservada de 08:00 a 11:00.
+**Esperado:** seis opciones viables. Las primeras cuatro son Aula 302, Aula 308, Aula 202 y Aula 304, todas como **Recomendada**. La ocupación prevista del Aula 304 es del 57,1 % (40 de 70 lugares). Aula 306 se descarta porque está reservada de 08:00 a 11:00.
 
 ### 2. Una preferencia no compensa una reserva existente
 
@@ -168,7 +170,7 @@ Antes de cada prueba, presiona **Nueva consulta** y selecciona la fecha **04/11/
 - **Requisitos obligatorios:** marcar TV/pantalla, Necesito mover mesas y sillas y Ruta accesible confirmada.
 - **Privacidad minima:** Media.
 
-**Esperado:** Aula 206 como **Recomendada**; despues, Aula 302, Aula 308 y Aula 202 como **Compatible con observaciones** por exceso de capacidad.
+**Esperado:** Aula 206, Aula 302, Aula 308 y Aula 202, en ese orden, todas como **Recomendada**.
 
 ### 4. Hibrida con privacidad alta
 
